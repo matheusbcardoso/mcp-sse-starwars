@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  nodejs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    restart: unless-stopped
+    networks:
+      - traefik_public
+      - app_network
+
+networks:
+  traefik_public:
+    external: true
+    name: externa
+  app_network:
+    external: true
+    name: interna
